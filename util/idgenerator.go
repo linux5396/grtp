@@ -18,7 +18,7 @@ type IdWorker struct {
 	maxWorkerId      int64
 	maxCenterId      int64
 	sequenceBits     int64
-	epoch            int64
+	epoch            int64 //begin offset timestamp
 	//next is some fields composite
 	workerIdShift      int64
 	dataCenterIdShift  int64
@@ -36,7 +36,7 @@ func NewIdWorker(workerId, dataCenterId, sequence int64) *IdWorker {
 	worker.sequence = sequence
 	//default set
 	worker.lastTimestamp = -1
-	worker.epoch = 1288834974657
+	worker.epoch = 0
 	worker.workerIdBits = 5
 	worker.dataCenterIdBits = 5
 	worker.maxWorkerId = (-1) ^ ((-1) << worker.workerIdBits)
@@ -66,6 +66,7 @@ func (idWorker *IdWorker) NextId() int64 {
 		idWorker.sequence = 0
 	}
 	idWorker.lastTimestamp = currentTimestamp
+	//currentTimestamp - epoch as init Id range
 	return ((currentTimestamp - idWorker.epoch) << idWorker.timestampLeftShift) |
 		(idWorker.dataCenterId << idWorker.dataCenterIdShift) |
 		(idWorker.workerId << idWorker.workerIdShift) |
